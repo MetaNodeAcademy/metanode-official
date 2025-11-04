@@ -32,7 +32,7 @@ jobs:
 
           qshell qupload2 \
             --src-dir=./ \
-            --bucket=${{ secrets.QINIU_BUCKET }} \
+            --bucket=$QINIU_BUCKET \
             --key-prefix="" \
             --overwrite=true \
             --ignore-dir=.git,.github,node_modules \
