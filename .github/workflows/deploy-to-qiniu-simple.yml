@@ -28,7 +28,14 @@ jobs:
           QINIU_SECRET_KEY: ${{ secrets.QINIU_SECRET_KEY }}
           QINIU_BUCKET: ${{ secrets.QINIU_BUCKET }}
         run: |
-          qshell account ${{secrets.QINIU_ACCESS_KEY}} ${{ secrets.QINIU_SECRET_KEY }} ROOT
-          
+          qshell account ${{secrets.QINIU_ACCESS_KEY}} ${{ secrets.QINIU_SECRET_KEY }} ${{ secrets.QINIU_BUCKET }}
+
+          qshell qupload2 \
+            --src-dir=./ \
+            --bucket=${{ secrets.QINIU_BUCKET }} \
+            --key-prefix="" \
+            --overwrite=true \
+            --ignore-dir=.git,.github,node_modules \
+            --ignore-suffixes=.md,.log
       
 
