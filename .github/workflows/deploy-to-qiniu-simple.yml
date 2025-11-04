@@ -36,7 +36,9 @@ jobs:
             --ignore-suffixes=.md,.log
       
       - name: Refresh CDN cache (optional)
-        if: ${{ secrets.QINIU_CDN_URL }}
+        env:
+          CDN_URL: ${{ secrets.QINIU_CDN_URL }}
+        if: env.CDN_URL != ''
         run: |
-          qshell cdnrefresh --urls "${{ secrets.QINIU_CDN_URL }}"
+          qshell cdnrefresh --urls "${{ env.CDN_URL }}"
 
