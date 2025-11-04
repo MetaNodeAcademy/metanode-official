@@ -28,7 +28,7 @@ jobs:
           QINIU_SECRET_KEY: ${{ secrets.QINIU_SECRET_KEY }}
           QINIU_BUCKET: ${{ secrets.QINIU_BUCKET }}
         run: |
-          qshell account $QINIU_ACCESS_KEY $QINIU_SECRET_KEY ROOT
+          qshell account ${{secrets.QINIU_ACCESS_KEY}} ${{ secrets.QINIU_SECRET_KEY }} ROOT
           
       
 
