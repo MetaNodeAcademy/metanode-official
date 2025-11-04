@@ -21,16 +21,24 @@ jobs:
           chmod +x qshell
           sudo mv qshell /usr/local/bin/
       
-      - name: Configure qshell
+      - name: Upload files to Qiniu
+        env:
+          QINIU_ACCESS_KEY: ${{ secrets.QINIU_ACCESS_KEY }}
+          QINIU_SECRET_KEY: ${{ secrets.QINIU_SECRET_KEY }}
+          QINIU_BUCKET: ${{ secrets.QINIU_BUCKET }}
         run: |
           mkdir -p ~/.qshell
-          qshell account ${{ secrets.QINIU_ACCESS_KEY }} ${{ secrets.QINIU_SECRET_KEY }} default
-      
-      - name: Upload files to Qiniu
-        run: |
+          cat > ~/.qshell/account.json << EOF
+          {
+            "default": {
+              "access_key": "$QINIU_ACCESS_KEY",
+              "secret_key": "$QINIU_SECRET_KEY"
+            }
+          }
+          EOF
           qshell qupload2 \
             --src-dir=./ \
-            --bucket=${{ secrets.QINIU_BUCKET }} \
+            --bucket=$QINIU_BUCKET \
             --key-prefix="" \
             --overwrite=true \
             --ignore-dir=.git,.github,node_modules \
