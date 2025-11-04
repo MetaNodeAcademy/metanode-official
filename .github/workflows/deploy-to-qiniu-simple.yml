@@ -1,4 +1,4 @@
-name: Deploy to Qiniu Cloud (Simple)
+name: Deploy to Qiniu Cloud
 
 on:
   push:
@@ -14,17 +14,29 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       
-      - name: Deploy to Qiniu
-        uses: wymlw/qiniu-upload-action@v1.0.1
-        with:
-          access_key: ${{ secrets.QINIU_ACCESS_KEY }}
-          secret_key: ${{ secrets.QINIU_SECRET_KEY }}
-          bucket: ${{ secrets.QINIU_BUCKET }}
-          local_dir: ./
-          remote_dir: /
-          ignore: |
-            .git
-            .github
-            node_modules
-            *.md
+      - name: Install qshell
+        run: |
+          wget -q https://github.com/qiniu/qshell/releases/download/v2.16.1/qshell-v2.16.1-linux-amd64.tar.gz
+          tar -xzf qshell-v2.16.1-linux-amd64.tar.gz
+          chmod +x qshell
+          sudo mv qshell /usr/local/bin/
+      
+      - name: Configure qshell
+        run: |
+          qshell account ${{ secrets.QINIU_ACCESS_KEY }} ${{ secrets.QINIU_SECRET_KEY }}
+      
+      - name: Upload files to Qiniu
+        run: |
+          qshell qupload2 \
+            --src-dir=./ \
+            --bucket=${{ secrets.QINIU_BUCKET }} \
+            --key-prefix="" \
+            --overwrite=true \
+            --ignore-dir=.git,.github,node_modules \
+            --ignore-suffixes=.md,.log
+      
+      - name: Refresh CDN cache (optional)
+        if: ${{ secrets.QINIU_CDN_URL }}
+        run: |
+          qshell cdnrefresh --urls "${{ secrets.QINIU_CDN_URL }}"
 
