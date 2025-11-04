@@ -29,13 +29,13 @@ jobs:
           QINIU_BUCKET: ${{ secrets.QINIU_BUCKET }}
         run: |
           qshell account $QINIU_ACCESS_KEY $QINIU_SECRET_KEY $QINIU_BUCKET
-
-          qshell qupload2 \
-            --src-dir=./ \
-            --bucket=$QINIU_BUCKET \
-            --key-prefix="" \
-            --overwrite=true \
-            --ignore-dir=.git,.github,node_modules \
-            --ignore-suffixes=.md,.log
+          qshell user meta-node
+          # qshell qupload2 \
+          #   --src-dir=./ \
+          #   --bucket=$QINIU_BUCKET \
+          #   --key-prefix="" \
+          #   --overwrite=true \
+          #   --ignore-dir=.git,.github,node_modules \
+          #   --ignore-suffixes=.md,.log
       
 
