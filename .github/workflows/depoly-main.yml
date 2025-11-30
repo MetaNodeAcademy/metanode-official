@@ -16,8 +16,8 @@ jobs:
       
       - name: Install ossutil
         run: |
-          # 下载 ossutil v1 (更稳定，无需解压)
-          wget -q http://gosspublic.alicdn.com/ossutil/1.7.19/ossutil64 -O ossutil
+          # 使用 curl 下载，增加重试，使用官方最新稳定链接
+          curl -L -o ossutil https://gosspublic.alicdn.com/ossutil/1.7.19/ossutil64
           chmod +x ossutil
           sudo mv ossutil /usr/local/bin/
           ossutil --version
