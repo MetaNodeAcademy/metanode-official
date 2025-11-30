@@ -16,10 +16,12 @@ jobs:
       
       - name: Install ossutil
         run: |
-          # 使用 curl 下载，增加重试，使用官方最新稳定链接
-          curl -L -o ossutil https://gosspublic.alicdn.com/ossutil/1.7.19/ossutil64
-          chmod +x ossutil
-          sudo mv ossutil /usr/local/bin/
+          # 下载 zip 包安装 (最可靠方式)
+          wget -q https://gosspublic.alicdn.com/ossutil/1.7.19/ossutil-v1.7.19-linux-amd64.zip
+          unzip -q ossutil-v1.7.19-linux-amd64.zip
+          chmod +x ossutil-v1.7.19-linux-amd64/ossutil
+          sudo mv ossutil-v1.7.19-linux-amd64/ossutil /usr/local/bin/
+          rm -rf ossutil-v1.7.19-linux-amd64*
           ossutil --version
 
       - name: Configure ossutil
