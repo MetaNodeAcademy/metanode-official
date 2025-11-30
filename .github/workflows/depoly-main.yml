@@ -16,26 +16,42 @@ jobs:
       
       - name: Install ossutil
         run: |
-          chmod +x ossutil64
-          sudo mv ossutil64 /usr/local/bin/
-          export PATH=$PATH:/usr/local/bin
+          curl -o ossutil-linux-amd64.zip https://gosspublic.alicdn.com/ossutil/v2/2.1.2/ossutil-2.1.2-linux-amd64.zip
+          unzip -q ossutil-linux-amd64.zip
+          chmod +x ossutil-2.1.2-linux-amd64/ossutil
+          sudo mv ossutil-2.1.2-linux-amd64/ossutil /usr/local/bin/ossutil
+          rm -rf ossutil-linux-amd64.zip ossutil-2.1.2-linux-amd64
+          ossutil --version
 
-      - name: Upload files to OSS
+      - name: Configure ossutil
         env:
           OSS_ACCESS_KEY: ${{ secrets.OSS_ACCESS_KEY }}
           OSS_SECRET_KEY: ${{ secrets.OSS_SECRET_KEY }}
-          OSS_BUCKET: ${{ secrets.OSS_BUCKET }}
           OSS_ENDPOINT: ${{ secrets.OSS_ENDPOINT }}
         run: |
           mkdir -p ~/.ossutilconfig.d
           cat > ~/.ossutilconfig <<EOF
           [Credentials]
           language=CH
-          endpoint=${{ secrets.OSS_ENDPOINT }}
-          accessKeyId=${{ secrets.OSS_ACCESS_KEY }}
-          accessKeySecret=${{ secrets.OSS_SECRET_KEY }}
+          endpoint=$OSS_ENDPOINT
+          accessKeyId=$OSS_ACCESS_KEY
+          accessKeySecret=$OSS_SECRET_KEY
           EOF
-          ossutil64 cp -r ./ oss://$OSS_BUCKET/
+          chmod 600 ~/.ossutilconfig
+          echo "Configuration file created successfully"
+
+      - name: Verify ossutil configuration
+        env:
+          OSS_BUCKET: ${{ secrets.OSS_BUCKET }}
+        run: |
+          ossutil ls oss://$OSS_BUCKET/ || echo "Bucket verification completed"
+
+      - name: Upload files to OSS
+        env:
+          OSS_BUCKET: ${{ secrets.OSS_BUCKET }}
+        run: |
+          ossutil cp -r ./ oss://$OSS_BUCKET/ --update --force
+          echo "Upload completed successfully"
 
       - name: Connect SSH
         run: |
