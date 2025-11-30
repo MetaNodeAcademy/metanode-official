@@ -29,7 +29,16 @@ jobs:
           OSS_ACCESS_KEY: ${{ secrets.OSS_ACCESS_KEY }}
           OSS_SECRET_KEY: ${{ secrets.OSS_SECRET_KEY }}
           OSS_BUCKET: ${{ secrets.OSS_BUCKET }}
+          OSS_ENDPOINT: ${{ secrets.OSS_ENDPOINT }}
         run: |
-          ossutil cp -r ./ oss://${{ env.OSS_BUCKET }}
+          ossutil config -e $OSS_ENDPOINT -i $OSS_ACCESS_KEY -k $OSS_SECRET_KEY
+          ossutil cp -r ./ oss://$OSS_BUCKET/
+
+      - name: Connect SSH
+        run: |
+          ssh -i ${{ secrets.SSH_PRIVATE_KEY }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}
+          cd /website/RCCWebsite
+          git pull
+          
           
 
