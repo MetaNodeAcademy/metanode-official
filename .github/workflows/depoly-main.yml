@@ -35,9 +35,9 @@ jobs:
           cat > ~/.ossutilconfig <<EOF
           [Credentials]
           language=CH
-          endpoint=$OSS_ENDPOINT
-          accessKeyId=$OSS_ACCESS_KEY
-          accessKeySecret=$OSS_SECRET_KEY
+          endpoint=${{ secrets.OSS_ENDPOINT }}
+          accessKeyId=${{ secrets.OSS_ACCESS_KEY }}
+          accessKeySecret=${{ secrets.OSS_SECRET_KEY }}
           EOF
           ossutil cp -r ./ oss://$OSS_BUCKET/
 
