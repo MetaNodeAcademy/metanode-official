@@ -35,7 +35,7 @@ jobs:
           cat > ~/.ossutilconfig <<EOF
           [Credentials]
           language=CH
-          endpoint=$OSS_ENDPOINT
+          endpoint=http://$OSS_ENDPOINT
           accessKeyID=$OSS_ACCESS_KEY
           accessKeySecret=$OSS_SECRET_KEY
           EOF
