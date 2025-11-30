@@ -16,11 +16,10 @@ jobs:
       
       - name: Install ossutil
         run: |
-          curl -o ossutil-linux-amd64.zip https://gosspublic.alicdn.com/ossutil/v2/2.1.2/ossutil-2.1.2-linux-amd64.zip
-          unzip -q ossutil-linux-amd64.zip
-          chmod +x ossutil-2.1.2-linux-amd64/ossutil
-          sudo mv ossutil-2.1.2-linux-amd64/ossutil /usr/local/bin/ossutil
-          rm -rf ossutil-linux-amd64.zip ossutil-2.1.2-linux-amd64
+          # 下载 ossutil v1 (更稳定，无需解压)
+          wget -q http://gosspublic.alicdn.com/ossutil/1.7.19/ossutil64 -O ossutil
+          chmod +x ossutil
+          sudo mv ossutil /usr/local/bin/
           ossutil --version
 
       - name: Configure ossutil
@@ -29,35 +28,40 @@ jobs:
           OSS_SECRET_KEY: ${{ secrets.OSS_SECRET_KEY }}
           OSS_ENDPOINT: ${{ secrets.OSS_ENDPOINT }}
         run: |
+          # 生成配置文件 (注意 v1 版本 accessKeyID 的 ID 为大写)
           mkdir -p ~/.ossutilconfig.d
           cat > ~/.ossutilconfig <<EOF
           [Credentials]
           language=CH
           endpoint=$OSS_ENDPOINT
-          accessKeyId=$OSS_ACCESS_KEY
+          accessKeyID=$OSS_ACCESS_KEY
           accessKeySecret=$OSS_SECRET_KEY
           EOF
           chmod 600 ~/.ossutilconfig
-          echo "Configuration file created successfully"
-
-      - name: Verify ossutil configuration
-        env:
-          OSS_BUCKET: ${{ secrets.OSS_BUCKET }}
-        run: |
-          ossutil ls oss://$OSS_BUCKET/ || echo "Bucket verification completed"
 
       - name: Upload files to OSS
         env:
           OSS_BUCKET: ${{ secrets.OSS_BUCKET }}
         run: |
-          ossutil cp -r ./ oss://$OSS_BUCKET/ --update --force
+          # -f 强制覆盖, -u 增量上传
+          ossutil cp -r -f -u ./ oss://$OSS_BUCKET/
           echo "Upload completed successfully"
 
-      - name: Connect SSH
+      - name: Connect SSH and Deploy
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
         run: |
-          ssh -i ${{ secrets.SSH_PRIVATE_KEY }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}
-          cd /website/RCCWebsite
-          git pull
+          # 配置 SSH 私钥
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          # 添加主机指纹 (可选，避免交互式确认)
+          ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
+          
+          # 执行远程命令
+          ssh -i ~/.ssh/id_rsa $SSH_USER@$SSH_HOST "cd /website/RCCWebsite && git pull"
           
           
 
