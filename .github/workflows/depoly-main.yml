@@ -46,7 +46,13 @@ jobs:
           OSS_BUCKET: ${{ secrets.OSS_BUCKET }}
         run: |
           # -f 强制覆盖, -u 增量上传
-          ossutil cp -r -f -u ./ oss://$OSS_BUCKET/
+          # 排除 .git 目录、GitHub workflows 配置、README 文件以及 ds_store
+          ossutil cp -r -f -u ./ oss://$OSS_BUCKET/ \
+            --exclude ".git/*" \
+            --exclude ".github/*" \
+            --exclude "README.md" \
+            --exclude ".DS_Store" \
+            --exclude ".gitignore"
           echo "Upload completed successfully"
 
       - name: Connect SSH and Deploy
