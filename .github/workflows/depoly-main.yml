@@ -54,21 +54,21 @@ jobs:
           ossutil cp -r -f -u ./ oss://$OSS_BUCKET/
           echo "Upload completed successfully"
 
-      - name: Connect SSH and Deploy
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          SSH_USER: ${{ secrets.SSH_USER }}
-          SSH_HOST: ${{ secrets.SSH_HOST }}
-        run: |
-          # 配置 SSH 私钥
-          mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          # 添加主机指纹 (可选，避免交互式确认)
-          ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
+      # - name: Connect SSH and Deploy
+      #   env:
+      #     SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      #     SSH_USER: ${{ secrets.SSH_USER }}
+      #     SSH_HOST: ${{ secrets.SSH_HOST }}
+      #   run: |
+      #     # 配置 SSH 私钥
+      #     mkdir -p ~/.ssh
+      #     echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+      #     chmod 600 ~/.ssh/id_rsa
+      #     # 添加主机指纹 (可选，避免交互式确认)
+      #     ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
           
-          # 执行远程命令
-          ssh -i ~/.ssh/id_rsa $SSH_USER@$SSH_HOST "cd /website/RCCWebsite && git pull"
+      #     # 执行远程命令
+      #     ssh -i ~/.ssh/id_rsa $SSH_USER@$SSH_HOST "cd /website/RCCWebsite && git pull"
           
           
 
