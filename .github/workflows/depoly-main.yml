@@ -31,7 +31,14 @@ jobs:
           OSS_BUCKET: ${{ secrets.OSS_BUCKET }}
           OSS_ENDPOINT: ${{ secrets.OSS_ENDPOINT }}
         run: |
-          ossutil config -e $OSS_ENDPOINT -i $OSS_ACCESS_KEY -k $OSS_SECRET_KEY
+          mkdir -p ~/.ossutilconfig.d
+          cat > ~/.ossutilconfig <<EOF
+          [Credentials]
+          language=CH
+          endpoint=$OSS_ENDPOINT
+          accessKeyId=$OSS_ACCESS_KEY
+          accessKeySecret=$OSS_SECRET_KEY
+          EOF
           ossutil cp -r ./ oss://$OSS_BUCKET/
 
       - name: Connect SSH
