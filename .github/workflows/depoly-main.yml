@@ -41,18 +41,17 @@ jobs:
           EOF
           chmod 600 ~/.ossutilconfig
 
+      - name: Prepare files for upload
+        run: |
+          # 删除不需要上传的文件和目录
+          rm -rf .git .github README.md .gitignore .DS_Store
+
       - name: Upload files to OSS
         env:
           OSS_BUCKET: ${{ secrets.OSS_BUCKET }}
         run: |
           # -f 强制覆盖, -u 增量上传
-          # 排除 .git 目录、GitHub workflows 配置、README 文件以及 ds_store
-          ossutil cp -r -f -u ./ oss://$OSS_BUCKET/ \
-            --exclude ".git/*" \
-            --exclude ".github/*" \
-            --exclude "README.md" \
-            --exclude ".DS_Store" \
-            --exclude ".gitignore"
+          ossutil cp -r -f -u ./ oss://$OSS_BUCKET/
           echo "Upload completed successfully"
 
       - name: Connect SSH and Deploy
